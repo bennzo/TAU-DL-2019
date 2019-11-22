@@ -50,8 +50,8 @@ def run(device):
     # Print results
     print(f'MSE Loss: {losses[-1]}')
     print('Predictions:')
-    print(f'Input | Output | True XOR')
-    print('\n'.join([f'{bits} | {out} | {label}' for bits, out, label in zip(train_set.bits, torch.cat(outputs), train_set.labels)]))
+    print(f'Input | True XOR | Prediction')
+    print('\n'.join([f'{bits} | {label} | {out}' for bits, out, label in zip(train_set.bits, torch.cat(outputs), train_set.labels)]))
     return net, losses
 
 
