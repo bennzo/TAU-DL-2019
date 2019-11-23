@@ -1,0 +1,5 @@
+Command: python train.py
+
+Fully Connected Network On Iris Dataset
+Final training loss: 0.05749547183513641
+Final Accuracy: 98.0%

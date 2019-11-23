@@ -39,7 +39,7 @@ def run(device):
             loss.backward()
             optimizer.step()
 
-            ep_loss += loss.item()
+            ep_loss += loss.item()*len(inputs)
             ep_acc += sum(probs.argmax(dim=-1) == labels).item()
         losses.append(ep_loss/len(train_set))
         accuracy.append(ep_acc/len(train_set))
@@ -55,17 +55,21 @@ if __name__ == '__main__':
         dev = torch.device('cpu')
     _, loss, acc = run(dev)
 
+    print(f'Fully Connected Network On Iris Dataset')
+    print(f'Final training loss: {loss[-1]}')
+    print(f'Final Accuracy: {acc[-1]*100}%')
+
     # Plot results
     plt.figure()
     plt.plot(range(args.epochs), loss)
-    plt.title('Training Loss - CrossEntropyLoss')
+    plt.title('Training Loss - CrossEntropyLoss vs Epoch')
     plt.ylabel('Loss')
     plt.xlabel('Epoch')
     plt.savefig('Loss.png')
 
     plt.figure()
     plt.plot(range(args.epochs), acc)
-    plt.title('Training Accuracy')
+    plt.title('Training Accuracy vs Epoch')
     plt.ylabel('Acc')
     plt.xlabel('Epoch')
     plt.savefig('Accuracy.png')

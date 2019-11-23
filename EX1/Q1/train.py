@@ -37,7 +37,7 @@ def run(device):
             loss.backward()
             optimizer.step()
 
-            ep_loss += loss.item()
+            ep_loss += loss.item()*len(inputs)
         losses.append(ep_loss/len(train_set))
 
     # Test trained network
