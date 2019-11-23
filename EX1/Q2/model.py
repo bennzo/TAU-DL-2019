@@ -1,9 +1,7 @@
 import numpy as np
 import torch.nn as nn
 from torch.utils.data import Dataset
-from torch.nn.functional import relu, log_softmax
-from itertools import product
-from functools import reduce
+from torch.nn.functional import relu
 
 
 class IrisDataset(Dataset):
@@ -15,8 +13,6 @@ class IrisDataset(Dataset):
         uniq_specs = np.unique(self.iris_specs)
         spec_idx = dict(zip(uniq_specs, range(len(uniq_specs))))
         self.labels = list(map(lambda spec: spec_idx[spec], self.iris_specs))
-        # self.labels = np.zeros((len(self.iris_specs), len(uniq_specs)), dtype=int)
-        # self.labels[range(len(self.iris_specs)), list(map(lambda spec: spec_idx[spec], self.iris_specs))] = 1
 
     def __getitem__(self, idx):
         return self.iris_feats[idx], self.labels[idx]
@@ -40,13 +36,10 @@ class IrisNet(nn.Module):
         probs = self.sm(out)
         return out, probs
 
+
 class ReQU(nn.Module):
     def __init__(self):
         super().__init__()
 
     def forward(self, x):
         return relu(x)*relu(x)
-
-
-if __name__ == '__main__':
-    dtest = IrisDataset('iris.data.csv')
