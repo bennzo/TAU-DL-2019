@@ -21,14 +21,12 @@ class XORDataset(Dataset):
 class XORNet(nn.Module):
     def __init__(self, nbits=2, hsize=3):
         super().__init__()
-        self.in_layer = nn.Linear(nbits, hsize)
-        self.hidden_layer = nn.Linear(hsize, hsize)
-        self.out_layer = nn.Linear(hsize, 1)
+        self.fc1 = nn.Linear(nbits, hsize)
+        self.fc2 = nn.Linear(hsize, 1)
         self.activation = nn.Tanh()
 
     def forward(self, bit_seq):
-        x = self.in_layer(bit_seq)
-        x = self.hidden_layer(x)
+        x = self.fc1(bit_seq)
         x = self.activation(x)
-        out = self.out_layer(x)
+        out = self.fc2(x)
         return out.flatten()
