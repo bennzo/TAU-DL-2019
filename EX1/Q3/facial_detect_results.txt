@@ -1,0 +1,5 @@
+ simple model:
+ train loss
+ 0.0011218679179104843 
+ validate loss
+ 0.0029569733305834234
