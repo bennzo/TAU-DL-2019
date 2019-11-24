@@ -1,8 +1,8 @@
- simple model:
- train loss
- 0.0011218679179104843 
- validate loss
- 0.0029569733305834234
+simple model:
+train loss
+0.03681309444603519
+validate loss
+0.1056879558295847
 
 convolution model 
 train loss 
