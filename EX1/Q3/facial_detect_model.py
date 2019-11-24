@@ -8,6 +8,9 @@ import matplotlib.pyplot as plt
 lr = 1e-4 # learning rate
 bs = 128 # batch size
 n_epoch = 400 # number of epochs
+device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
+
+print(device)
 
 def create_conv_model():
     model = nn.Sequential(
@@ -45,10 +48,8 @@ def train_model(x, y, x_valid, y_valid, model_name):
     else:
         model = create_conv_model()
 
-    loss_fn = nn.MSELoss(reduction='mean')
+    loss_fn = nn.MSELoss(reduction='sum')
     optimizer = optim.Adam(model.parameters(), lr=lr)
-
-    num_batch = math.ceil(len(x) / bs)
 
     loss_vals = []
     test_loss_vals = []
@@ -57,9 +58,9 @@ def train_model(x, y, x_valid, y_valid, model_name):
         loss_val = 0
         for x_vecs, y_vecs in get_next_batch(x, y, model_name):
             # Forward pass: compute predicted y by passing x to the model.
-            y_pred = model(x_vecs)
+            y_pred = model(x_vecs.to(device))
             # Compute loss
-            loss = loss_fn(y_pred, y_vecs) # return the average
+            loss = loss_fn(y_pred.to(device), y_vecs.to(device)) # return the average
             loss_val += loss.item()
             # Before the backward pass, use the optimizer object to zero all of the
             # gradients for the Tensors it will update (which are the learnable weights
@@ -72,7 +73,7 @@ def train_model(x, y, x_valid, y_valid, model_name):
             # Calling the step function on an Optimizer makes an update to its parameters
             optimizer.step()
 
-        loss_val /= num_batch
+        loss_val /= len(x)
         loss_vals.append(loss_val)
         test_loss_val = evaluate(model, loss_fn, x_valid, y_valid, model_name)
         test_loss_vals.append(test_loss_val)
@@ -117,7 +118,7 @@ def evaluate(model, loss_fn, x, y, model_name):
     num_batch = math.ceil(len(x) / bs)
     loss_val = 0
     for x_vecs, y_vecs in get_next_batch(x, y, model_name):
-        y_pred = model(x_vecs)
+        y_pred = model(x_vecs.to(device))
         loss = loss_fn(y_pred, y_vecs)
         loss_val += loss.item()
-    return loss_val / num_batch
+    return loss_val / len(x)
