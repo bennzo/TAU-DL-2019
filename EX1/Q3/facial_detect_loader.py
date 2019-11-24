@@ -14,7 +14,6 @@ FTEST = gen_full_path('..', 'test', 'test.csv')
 
 def split_data(X, y):
     valid_size = int(len(X) * 0.2)
-    print(valid_size)
     X_valid = X[:valid_size] # Note, X, y are shuffled already
     y_valid = y[:valid_size]
     X = X[valid_size:]

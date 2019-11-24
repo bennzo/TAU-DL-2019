@@ -6,17 +6,46 @@ import math
 import matplotlib.pyplot as plt
 
 lr = 1e-4 # learning rate
-bs = 16 # batch size
-n_epoch = 100 # number of epochs
+bs = 128 # batch size
+n_epoch = 400 # number of epochs
 
-def train_model(x, y, x_valid, y_valid):
+def create_conv_model():
+    model = nn.Sequential(
+        nn.Conv2d(1, 32, 3), # 32 * 94 * 94
+        nn.MaxPool2d(2, stride=2), # 32 * 47 * 47
+        nn.ReLU(),
+        nn.Conv2d(32, 64, 2), # 64 * 46 * 46
+        nn.MaxPool2d(2, stride=2), # 64 * 23 * 23
+        nn.ReLU(),
+        nn.Conv2d(64, 128, 2), # 128 * 22 * 22
+        nn.MaxPool2d(2, stride=2), # 128 * 11 * 11
+        nn.ReLU(),
+        nn.Flatten(), # 15488
+        nn.Linear(15488, 500),
+        nn.ReLU(),
+        nn.Linear(500, 500),
+        nn.ReLU(),
+        nn.Linear(500, 30)
+    )
+    return model
+
+def create_simple_model():
     model = nn.Sequential(
         nn.Linear(9216, 100), 
         nn.ReLU(), 
         nn.Linear(100, 30),
     )
+    return model
 
-    loss_fn = nn.MSELoss()
+def train_model(x, y, x_valid, y_valid, model_name):
+    print("Building {} model".format(model_name))
+
+    if model_name == 'simple':
+        model = create_simple_model()
+    else:
+        model = create_conv_model()
+
+    loss_fn = nn.MSELoss(reduction='mean')
     optimizer = optim.Adam(model.parameters(), lr=lr)
 
     num_batch = math.ceil(len(x) / bs)
@@ -26,7 +55,7 @@ def train_model(x, y, x_valid, y_valid):
 
     for t in range(n_epoch):
         loss_val = 0
-        for x_vecs, y_vecs in get_next_batch(x, y):
+        for x_vecs, y_vecs in get_next_batch(x, y, model_name):
             # Forward pass: compute predicted y by passing x to the model.
             y_pred = model(x_vecs)
             # Compute loss
@@ -45,21 +74,25 @@ def train_model(x, y, x_valid, y_valid):
 
         loss_val /= num_batch
         loss_vals.append(loss_val)
-        test_loss_val = evaluate(model, loss_fn, x_valid, y_valid)
+        test_loss_val = evaluate(model, loss_fn, x_valid, y_valid, model_name)
         test_loss_vals.append(test_loss_val)
         print(t, loss_val, test_loss_val)
 
     t_vals = np.arange(1, n_epoch + 1)
 
-    plt.plot(t_vals, loss_vals, 'r--', label='train')
-    plt.plot(t_vals, test_loss_vals, 'b--', label='test')
+    plt.plot(t_vals, loss_vals, 'r--', linewidth=3, label='train')
+    plt.plot(t_vals, test_loss_vals, 'b--', linewidth=3, label='test')
     plt.ylabel('loss')
     plt.xlabel('epoch')
+    plt.grid()
     plt.legend(loc='upper center', fontsize='x-large')
-    plt.savefig('facial_detect_loss')
+    fig_name = 'facial_detect_loss_'
+    fig_name += model_name
+    fig_name += '_model'
+    plt.savefig(fig_name)
     plt.show()
 
-def get_next_batch(x, y):
+def get_next_batch(x, y, model_name):
     x_vecs = []
     y_vecs = []
 
@@ -72,14 +105,18 @@ def get_next_batch(x, y):
         x_vecs.append(x[ind])
         y_vecs.append(y[ind])
         if i % bs == 0 or i == n_inputs:
-            yield torch.stack(x_vecs), torch.stack(y_vecs)
+            x_vecs = torch.stack(x_vecs)
+            y_vecs = torch.stack(y_vecs)
+            if model_name == 'conv':
+                x_vecs = x_vecs.view(len(x_vecs), 1, 96, 96)
+            yield x_vecs, y_vecs
             x_vecs = []
             y_vecs = []
 
-def evaluate(model, loss_fn, x, y):
+def evaluate(model, loss_fn, x, y, model_name):
     num_batch = math.ceil(len(x) / bs)
     loss_val = 0
-    for x_vecs, y_vecs in get_next_batch(x, y):
+    for x_vecs, y_vecs in get_next_batch(x, y, model_name):
         y_pred = model(x_vecs)
         loss = loss_fn(y_pred, y_vecs)
         loss_val += loss.item()
