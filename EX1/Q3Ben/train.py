@@ -9,7 +9,7 @@ from model import FacialDataset, FacialNet2, FacialNet3
 parser = argparse.ArgumentParser()
 parser.add_argument('--question', type=int, default=2, help='Question section')
 parser.add_argument('--dpath', type=str, default='training.csv', help='length of a bit sequence')
-parser.add_argument('--epochs', type=int, default=100, help='Number of epochs to train on')
+parser.add_argument('--epochs', type=int, default=500, help='Number of epochs to train on')
 parser.add_argument('--lr', type=float, default=0.001, help='Learning rate')
 parser.add_argument('--batch_size', type=int, default=16, help='Batch size')
 parser.add_argument('--no_gpu', action='store_true', help='Disable gpu usage')
@@ -50,7 +50,7 @@ def run(device, question):
             loss.backward()
             optimizer.step()
 
-            ep_train_loss += loss.item()
+            ep_train_loss += loss.item()*len(images)
         train_loss.append(ep_train_loss/len(train_set))
 
         # Test loop
@@ -62,7 +62,7 @@ def run(device, question):
             outputs = net(images)
             loss = criterion(outputs, annots)
 
-            ep_test_loss += loss.item()
+            ep_test_loss += loss.item()*len(images)
         test_loss.append(ep_test_loss/len(test_set))
 
     return net, train_loss, test_loss

@@ -1,8 +1,8 @@
 Command: python train.py
 
 Fully Connected Network on Facial Keypoint Detection:
-Final training loss: 0.00016451044769459362
-Final test loss: 0.00046001916107173276
+Final training loss: 0.0016130751856193643
+Final test loss: 0.006091647024188086
 Convolutional Network on Facial Keypoint Detection:
-Final training loss: 3.269698519994631e-06
-Final test loss: 0.00018090704835681506
+Final training loss: 1.2600699111852723e-05
+Final test loss: 0.0029384654959681154
