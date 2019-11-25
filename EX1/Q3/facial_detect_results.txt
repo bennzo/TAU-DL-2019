@@ -1,10 +1,13 @@
+Command: python facial_detect_main.py -m simple
+Command: python facial_detect_main.py -m conv
+
 Running on 400 epochs
 loss result of final epoch:
 
 simple model:
-train loss 0.03681309444603519
-test loss 0.1056879558295847
+train loss: 0.0467
+test loss: 0.0979
 
 convolution model 
-train loss 0.002768852930759715 
-test loss 0.03443516971908997
+train loss: 0.0032
+test loss: 0.0356

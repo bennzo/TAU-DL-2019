@@ -77,7 +77,7 @@ def train_model(x, y, x_valid, y_valid, model_name):
         test_loss_val = evaluate(model, loss_fn, x_valid, y_valid, model_name)
         test_loss_vals.append(test_loss_val)
         if t % print_every == 0:
-            print(t, loss_val, test_loss_val)
+            print("epoch {}, train loss: {:.4f}, test loss: {:.4f}".format(t, loss_val, test_loss_val))
 
     t_vals = np.arange(1, n_epoch + 1)
 
