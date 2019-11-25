@@ -10,8 +10,6 @@ bs = 128 # batch size
 n_epoch = 400 # number of epochs
 device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
 
-print(device)
-
 def create_conv_model():
     model = nn.Sequential(
         nn.Conv2d(1, 32, 3), # 32 * 94 * 94
@@ -29,7 +27,7 @@ def create_conv_model():
         nn.Linear(500, 500),
         nn.ReLU(),
         nn.Linear(500, 30)
-    )
+    ).to(device)
     return model
 
 def create_simple_model():
@@ -37,7 +35,7 @@ def create_simple_model():
         nn.Linear(9216, 100), 
         nn.ReLU(), 
         nn.Linear(100, 30),
-    )
+    ).to(device)
     return model
 
 def train_model(x, y, x_valid, y_valid, model_name):
@@ -119,6 +117,6 @@ def evaluate(model, loss_fn, x, y, model_name):
     loss_val = 0
     for x_vecs, y_vecs in get_next_batch(x, y, model_name):
         y_pred = model(x_vecs.to(device))
-        loss = loss_fn(y_pred, y_vecs)
+        loss = loss_fn(y_pred.to(device), y_vecs.to(device))
         loss_val += loss.item()
     return loss_val / len(x)
