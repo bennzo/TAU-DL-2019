@@ -9,6 +9,7 @@ lr = 1e-4 # learning rate
 bs = 128 # batch size
 n_epoch = 400 # number of epochs
 device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
+print_every = 10 # how many iterations to output loss  
 
 def create_conv_model():
     model = nn.Sequential(
@@ -52,7 +53,7 @@ def train_model(x, y, x_valid, y_valid, model_name):
     loss_vals = []
     test_loss_vals = []
 
-    for t in range(n_epoch):
+    for t in range(1, n_epoch + 1):
         loss_val = 0
         for x_vecs, y_vecs in get_next_batch(x, y, model_name):
             # Forward pass: compute predicted y by passing x to the model.
@@ -75,7 +76,8 @@ def train_model(x, y, x_valid, y_valid, model_name):
         loss_vals.append(loss_val)
         test_loss_val = evaluate(model, loss_fn, x_valid, y_valid, model_name)
         test_loss_vals.append(test_loss_val)
-        print(t, loss_val, test_loss_val)
+        if t % print_every == 0:
+            print(t, loss_val, test_loss_val)
 
     t_vals = np.arange(1, n_epoch + 1)
 
@@ -89,7 +91,7 @@ def train_model(x, y, x_valid, y_valid, model_name):
     fig_name += model_name
     fig_name += '_model'
     plt.savefig(fig_name)
-    plt.show()
+    # plt.show()
 
 def get_next_batch(x, y, model_name):
     x_vecs = []
