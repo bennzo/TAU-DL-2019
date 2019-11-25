@@ -47,7 +47,7 @@ def train_model(x, y, x_valid, y_valid, model_name):
     else:
         model = create_conv_model()
 
-    loss_fn = nn.MSELoss(reduction='sum')
+    loss_fn = nn.MSELoss(reduction='mean')
     optimizer = optim.Adam(model.parameters(), lr=lr)
 
     loss_vals = []
@@ -60,7 +60,7 @@ def train_model(x, y, x_valid, y_valid, model_name):
             y_pred = model(x_vecs.to(device))
             # Compute loss
             loss = loss_fn(y_pred.to(device), y_vecs.to(device)) # return the average
-            loss_val += loss.item()
+            loss_val += loss.item() * len(x_vecs)
             # Before the backward pass, use the optimizer object to zero all of the
             # gradients for the Tensors it will update (which are the learnable weights
             # of the model)
@@ -76,8 +76,8 @@ def train_model(x, y, x_valid, y_valid, model_name):
         loss_vals.append(loss_val)
         test_loss_val = evaluate(model, loss_fn, x_valid, y_valid, model_name)
         test_loss_vals.append(test_loss_val)
-        if t % print_every == 0:
-            print("epoch {}, train loss: {:.4f}, test loss: {:.4f}".format(t, loss_val, test_loss_val))
+        if t % print_every == 0 or t == n_epoch:
+            print("epoch {}, train loss: {:.6f}, test loss: {:.6f}".format(t, loss_val, test_loss_val))
 
     t_vals = np.arange(1, n_epoch + 1)
 
@@ -115,10 +115,9 @@ def get_next_batch(x, y, model_name):
             y_vecs = []
 
 def evaluate(model, loss_fn, x, y, model_name):
-    num_batch = math.ceil(len(x) / bs)
     loss_val = 0
     for x_vecs, y_vecs in get_next_batch(x, y, model_name):
         y_pred = model(x_vecs.to(device))
         loss = loss_fn(y_pred.to(device), y_vecs.to(device))
-        loss_val += loss.item()
+        loss_val += loss.item() * len(x_vecs)
     return loss_val / len(x)

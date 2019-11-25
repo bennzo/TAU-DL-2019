@@ -5,9 +5,9 @@ Running on 400 epochs
 loss result of final epoch:
 
 simple model:
-train loss: 0.0467
-test loss: 0.0979
+train loss: 0.0011
+test loss: 0.0029
 
 convolution model 
-train loss: 0.0032
-test loss: 0.0356
+train loss: 0.000056
+test loss: 0.001195
