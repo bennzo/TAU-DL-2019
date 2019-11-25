@@ -1,4 +1,5 @@
 import argparse
+import random
 import matplotlib.pyplot as plt
 import torch
 import torch.nn as nn
@@ -9,7 +10,7 @@ from model import FacialDataset, FacialNet2, FacialNet3
 parser = argparse.ArgumentParser()
 parser.add_argument('--question', type=int, default=2, help='Question section')
 parser.add_argument('--dpath', type=str, default='training.csv', help='length of a bit sequence')
-parser.add_argument('--epochs', type=int, default=500, help='Number of epochs to train on')
+parser.add_argument('--epochs', type=int, default=300, help='Number of epochs to train on')
 parser.add_argument('--lr', type=float, default=0.001, help='Learning rate')
 parser.add_argument('--batch_size', type=int, default=16, help='Batch size')
 parser.add_argument('--no_gpu', action='store_true', help='Disable gpu usage')
@@ -28,6 +29,7 @@ def run(device, question):
     criterion = nn.MSELoss()
 
     idxs, split = list(range(len(dataset))), round(0.8*len(dataset))
+    random.shuffle(idxs)
     train_set = Subset(dataset, idxs[:split])
     test_set = Subset(dataset, idxs[split:])
     train_loader = DataLoader(train_set, batch_size=args.batch_size, shuffle=True)
@@ -74,6 +76,7 @@ if __name__ == '__main__':
         dev = torch.device('cuda')
     else:
         dev = torch.device('cpu')
+    random.seed(0)
 
     # Fully Connected Run
     _, train_loss, test_loss = run(dev, 2)
